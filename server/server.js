@@ -1,9 +1,6 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const cors = require('cors');
-
-
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -12,7 +9,8 @@ const io = socketIo(server, {
         methods: ['GET', 'POST'],
     },
 });
-
+const dotenv = require('dotenv');
+dotenv.config(); // Load .env file variables
 let textContent = '';
 let lockOwner = null; // Store the ID of the locking user
 let lockOwnerName = ''; // Store the locking user's name

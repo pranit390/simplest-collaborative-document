@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+const apiUrl = process.env.REACT_APP_API_URL;
+console.log(apiUrl,"xjsbjsbxjhs");
 
-const socket = io('http://localhost:4000');
+const socket = io(apiUrl);
 
 const CollaborativeEditor = () => {
     const [text, setText] = useState('');

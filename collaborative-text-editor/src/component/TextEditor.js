@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 const apiUrl = process.env.REACT_APP_API_URL;
-console.log(apiUrl,"xjsbjsbxjhs");
+const inactivitySeconds = process.env.REACT_APP_INACTIVITY_SECONDS;
+
+
 
 const socket = io(apiUrl);
 
@@ -81,7 +83,7 @@ const CollaborativeEditor = () => {
                 // Unlock if this user was the lock owner
                 unlockDocument();
             }
-        }, 5000); // Adjust time as needed
+        }, inactivitySeconds); // Adjust time as needed
     };
     const unlockDocument = () => {
         setLockOwner(null);

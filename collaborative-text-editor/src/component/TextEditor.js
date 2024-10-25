@@ -9,6 +9,7 @@ const CollaborativeEditor = () => {
     const [lockOwner, setLockOwner] = useState(null);
     const [lockOwnerName, setLockOwnerName] = useState('');
     const [userName, setUserName] = useState('');
+    let inactivityTimer;
 
     useEffect(() => {
         const storedUserName = sessionStorage.getItem('userName');
@@ -68,15 +69,32 @@ const CollaborativeEditor = () => {
             setLockOwnerName(sessionStorage.getItem('userName'));
             socket.emit('lockStatus', { ownerId: sessionStorage.getItem('userId'), ownerName: sessionStorage.getItem('userName') });
         }
+        resetInactivityTimer(); // Reset timer on input change
+    };
+
+    const resetInactivityTimer = () => {
+        clearTimeout(inactivityTimer); // Clear existing timer
+        inactivityTimer = setTimeout(() => {
+            if (lockOwner === sessionStorage.getItem('userId')) {
+                // Unlock if this user was the lock owner
+                unlockDocument();
+            }
+        }, 5000); // Adjust time as needed
+    };
+    const unlockDocument = () => {
+        setLockOwner(null);
+        setLockOwnerName('');
+        socket.emit('lockStatus', { ownerId: null, ownerName: '' }); // Notify others of unlock
     };
 
     const handleBlur = () => {
         if (lockOwner === sessionStorage.getItem('userId')) {
-            // Unlock on blur
-            setLockOwner(null);
-            setLockOwnerName('');
-            socket.emit('lockStatus', { ownerId: null, ownerName: '' }); // Notify others of unlock
+            unlockDocument(); // Unlock on blur
         }
+    };
+
+    const handleFocus = () => {
+        resetInactivityTimer(); // Reset timer on focus
     };
 
     return (
@@ -85,7 +103,8 @@ const CollaborativeEditor = () => {
             <textarea 
                 value={text} 
                 onChange={handleChange} 
-                onBlur={handleBlur} 
+                onBlur={handleBlur}
+                onFocus={handleFocus} 
                 disabled={lockOwner !== null && lockOwner !== sessionStorage.getItem('userId')}
                 style={{ width: '70%', height: '200px' }}
             />
